@@ -1,0 +1,9 @@
+{
+  "name": "vida-de-cao-assistente",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx vercel dev",
+    "test": "node --test"
+  }
+}
