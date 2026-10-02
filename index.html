@@ -13,7 +13,8 @@
   <link rel="apple-touch-icon" href="assets/logo-280.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
   <link rel="preload" as="image" href="assets/vet-pug-portrait.png" fetchpriority="high">
   <title>Vida de Cão | Hospital Veterinário 24h na Ilha do Governador</title>
   <style>
@@ -193,6 +194,22 @@
     }
     @media(prefers-reduced-motion:reduce){.ai-chat-launcher,.ai-chat-transcript{scroll-behavior:auto;transition:none}}
   </style>
+  <style id="lighthouse-a11y-and-rendering-fixes">
+    :root{--focus:#0b5867}
+    a:focus-visible,button:focus-visible,iframe:focus-visible{outline:3px solid var(--focus);outline-offset:3px;box-shadow:0 0 0 2px #fff}
+    .topline-inner{min-height:44px}
+    .topline a,.nav-links>a{display:inline-flex;min-height:44px;align-items:center}
+    .contact-numbers a{min-height:44px}
+    .reviews-link{min-height:44px;align-items:center}
+    .review-controls button{width:44px;height:44px}
+    .review-stars{color:#805800}
+    .review-date,.review-foot,.team-person span,.proof-item span,.service-row p,.section-intro,.services-contact-note,.faq-intro,.faq-answer{color:#52635f}
+    .faq-item button{min-height:56px}
+    .footer-col a{min-height:44px;align-items:center}
+    .ai-chat-close{width:44px;height:44px}
+    .ai-chat-quick button,.ai-chat-quick a{min-height:44px}
+    @media(max-width:560px){.topline-inner{min-height:44px}.contact-numbers a{min-height:44px}.faq-item button{min-height:56px}.footer-col a{min-height:44px}}
+  </style>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VeterinaryCare","name":"Hospital Veterinário Vida de Cão","telephone":"+55-21-3393-0985","address":{"@type":"PostalAddress","streetAddress":"Rua Jaime Perdigão, 251","addressLocality":"Rio de Janeiro","addressRegion":"RJ","postalCode":"21920-240","addressCountry":"BR"},"openingHours":"Mo-Su 00:00-23:59","areaServed":"Ilha do Governador, Rio de Janeiro"}</script>
 </head>
 <body>
@@ -256,8 +273,8 @@
     navLinks.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{navLinks.classList.remove('open');menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Abrir menu')}));
     document.querySelectorAll('.faq-item button').forEach(button=>button.addEventListener('click',()=>{const answer=button.nextElementSibling;const expanded=button.getAttribute('aria-expanded')==='true';button.setAttribute('aria-expanded',String(!expanded));answer.classList.toggle('open',!expanded)}));
     document.addEventListener('click',event=>{const anchor=event.target.closest('a');if(!anchor)return;const href=anchor.href||'';const eventName=anchor.dataset.track||(href.includes('wa.me')?'whatsapp_click':href.startsWith('tel:')?'phone_click':href.includes('maps.google')||href.includes('google.com/maps')||href.includes('waze.com')?'directions_click':'');if(eventName){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:eventName})}});
-    (()=>{const track=document.querySelector('.reviews-track'),cards=[...document.querySelectorAll('.review-card')],prev=document.querySelector('.review-prev'),next=document.querySelector('.review-next'),position=document.querySelector('.review-position');if(!track||!cards.length)return;const update=()=>{const bounds=track.getBoundingClientRect(),visible=cards.map((card,index)=>({index,rect:card.getBoundingClientRect()})).filter(card=>card.rect.right>bounds.left+1&&card.rect.left<bounds.right-1);if(visible.length)position.textContent=`${visible[0].index+1}–${visible[visible.length-1].index+1} de ${cards.length}`};prev.addEventListener('click',()=>track.scrollBy({left:-track.clientWidth*.8,behavior:'smooth'}));next.addEventListener('click',()=>track.scrollBy({left:track.clientWidth*.8,behavior:'smooth'}));track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update);update()})();
-    (()=>{const feed=document.querySelector('.instagram-grid'),posts=feed?.querySelectorAll('.instagram-media');if(!feed||!posts?.length)return;let loaded=false;const load=()=>{if(loaded)return;loaded=true;const script=document.createElement('script');script.src='https://www.instagram.com/embed.js';script.async=true;script.onload=()=>window.instgrm?.Embeds?.process();document.body.appendChild(script)};if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){load();observer.disconnect()}},{rootMargin:'600px 0px'});observer.observe(feed)}else load()})();
+    (()=>{const track=document.querySelector('.reviews-track'),cards=[...document.querySelectorAll('.review-card')],prev=document.querySelector('.review-prev'),next=document.querySelector('.review-next'),position=document.querySelector('.review-position');if(!track||!cards.length)return;let queued=false;const update=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;const bounds=track.getBoundingClientRect();let first=-1,last=-1;cards.forEach((card,index)=>{const rect=card.getBoundingClientRect();if(rect.right>bounds.left+1&&rect.left<bounds.right-1){if(first<0)first=index;last=index}});if(first>=0)position.textContent=`${first+1}–${last+1} de ${cards.length}`})};prev.addEventListener('click',()=>track.scrollBy({left:-track.clientWidth*.8,behavior:'smooth'}));next.addEventListener('click',()=>track.scrollBy({left:track.clientWidth*.8,behavior:'smooth'}));track.addEventListener('scroll',update,{passive:true});window.addEventListener('resize',update,{passive:true});update()})();
+    (()=>{const feed=document.querySelector('.instagram-grid'),posts=feed?.querySelectorAll('.instagram-media');if(!feed||!posts?.length)return;let loaded=false;const load=()=>{if(loaded)return;loaded=true;const script=document.createElement('script');script.src='https://www.instagram.com/embed.js';script.async=true;script.onload=()=>window.instgrm?.Embeds?.process();document.body.appendChild(script)};if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)){load();observer.disconnect()}},{rootMargin:'100px 0px'});observer.observe(feed)}else load()})();
   </script>
   <section class="ai-chat-widget" aria-label="Assistente virtual da Vida de Cão">
     <button class="ai-chat-launcher" id="ai-chat-launcher" type="button" aria-expanded="false" aria-controls="ai-chat-panel">
@@ -375,3 +392,4 @@
   </script>
 </body>
 </html>
+
