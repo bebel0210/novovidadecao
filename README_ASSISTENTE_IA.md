@@ -6,9 +6,9 @@ Este pacote mantém o site existente e acrescenta um chat compacto no canto infe
 
 ## O que o assistente pode responder
 
-O assistente usa somente informações encontradas no HTML atual: endereço, atendimento 24 horas, telefones, WhatsApp, serviços, estrutura e Instagram. O servidor identifica perguntas sobre preços/pagamentos e resultados/laudos e responde com uma mensagem fixa, sem enviá-las ao modelo. Ele não tem acesso a prontuários ou sistemas de pacientes. Valores, disponibilidade, pagamentos e horários específicos do Pet Táxi não foram informados; por isso, o chat orienta a confirmar com a equipe. Não confirma agendamentos, não diagnostica e não prescreve. Perguntas com termos de emergência recebem orientação imediata para ligar ou ir ao hospital.
+O assistente usa somente informações encontradas no HTML atual: endereço, atendimento 24 horas, telefones, WhatsApp, serviços, estrutura e Instagram. O servidor identifica perguntas sobre preços/pagamentos e resultados/laudos e responde com uma mensagem fixa, sem enviá-las ao modelo. Relatos comuns de sintomas e termos de emergência também são encaminhados sem chamar o modelo: a pessoa recebe um link para abrir o WhatsApp com um rascunho contendo o sintoma e outro para ligar à clínica. O texto não é enviado automaticamente; a pessoa pode revisar e decidir se envia. O assistente não avalia sintomas, não diagnostica e não prescreve. Ele não tem acesso a prontuários ou sistemas de pacientes. Valores, disponibilidade, pagamentos e horários específicos do Pet Táxi não foram informados; por isso, o chat orienta a confirmar com a equipe.
 
-O texto das respostas é inserido como texto simples no navegador, sem executar HTML recebido da IA. O histórico vive apenas na memória da página aberta; não há banco de conversas nem `localStorage`. A cada pergunta, a função recebe até 10 mensagens recentes e a base pública da clínica, e encaminha esses dados à OpenAI. A requisição usa `store: false`; isso desativa o armazenamento da resposta para recuperação pela API, mas não deve ser interpretado como promessa de retenção zero por todos os serviços envolvidos. A infraestrutura da hospedagem também processa os pedidos. A interface orienta o visitante a não enviar dados pessoais ou informações médicas.
+O texto das respostas é inserido como texto simples no navegador, sem executar HTML recebido da IA. O histórico vive apenas na memória da página aberta; não há banco de conversas nem `localStorage`, então não há atualmente uma tela/local para consultar transcrições. Ao fechar ou recarregar a página, a conversa do navegador se perde. Nas perguntas encaminhadas ao modelo, a função recebe até 10 mensagens recentes e a base pública da clínica, e envia esses dados à OpenAI. Emergências, sintomas identificados, preços, resultados de exames e pedidos fora do escopo recebem tratamento fixo no servidor e não são enviados ao modelo. A requisição ao modelo usa `store: false`; isso desativa o armazenamento da resposta para recuperação pela API, mas não deve ser interpretado como promessa de retenção zero por todos os serviços envolvidos. A infraestrutura da hospedagem também processa os pedidos. Para manter histórico consultável seria necessário implementar armazenamento próprio com aviso/consentimento, acesso restrito, prazo de retenção e cuidado adicional por envolver dados de saúde de animais e possivelmente dados pessoais.
 
 ## Testar localmente no Windows
 
@@ -45,7 +45,7 @@ Edite `data/clinic-info.js` apenas com dados confirmados pela clínica. As mesma
 
 ## O que foi testado
 
-- `npm test`: testes locais simulam as respostas da OpenAI; cobrem método inválido, corpo malformado/grande, emergência, roteamento de perguntas de preço e resultado de exame sem chamar a IA, resposta bem-sucedida, falta de chave e limite básico de pedidos. Eles não consomem API nem provam que sua chave ou conta têm acesso ao modelo.
+- `npm test`: testes locais simulam as respostas da OpenAI; cobrem método inválido, corpo malformado/grande, emergência e sintomas encaminhados sem chamar a IA, links do WhatsApp com rascunho e da ligação, roteamento de preço/resultado de exame e recusa de pedidos fora do escopo, resposta bem-sucedida, falta de chave e limite básico de pedidos. Eles não consomem API nem provam que sua chave ou conta têm acesso ao modelo.
 - A interface deve ser conferida via `npm run dev` em desktop e celular. O envio real depende de chave válida configurada na Vercel/local e de uma implantação da função.
 - Não foi feito deploy nem chamada real à API. A chave não foi solicitada nem incluída nos arquivos.
 
@@ -59,3 +59,4 @@ Edite `data/clinic-info.js` apenas com dados confirmados pela clínica. As mesma
 - [Vercel Functions para Node.js](https://vercel.com/docs/functions/runtimes/node-js)
 - [Variáveis de ambiente da Vercel](https://vercel.com/docs/environment-variables)
 - [Rate limiting do Vercel Firewall](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)
+

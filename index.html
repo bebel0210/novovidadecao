@@ -151,6 +151,10 @@
     .ai-chat-message{width:fit-content;max-width:90%;padding:11px 13px;background:#f1f5f5;color:#173a42;font-size:13px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
     .ai-chat-message.user{align-self:flex-end;background:var(--ink);color:#fff}
     .ai-chat-message a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+    .ai-chat-actions{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .ai-chat-actions a{display:flex;min-height:44px;align-items:center;justify-content:center;padding:9px 12px;border:1px solid var(--ink);background:var(--ink);color:#fff;font:600 12px var(--sans);text-align:center;text-decoration:none}
+    .ai-chat-actions a:first-child{border-color:var(--ink);background:#f8b918;color:var(--ink)}
+    .ai-chat-actions a:hover{filter:brightness(.95)}
     .ai-chat-quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
     .ai-chat-quick button,.ai-chat-quick a{display:inline-flex;min-height:38px;align-items:center;justify-content:center;padding:7px 10px;border:1px solid var(--ink2);background:#fff;color:var(--ink);font:600 11px var(--sans);text-decoration:none;cursor:pointer}
     .ai-chat-quick button:hover,.ai-chat-quick a:hover{background:#fff5cf;border-color:var(--ink)}
@@ -303,13 +307,13 @@
           <a href="https://wa.me/5521989206424" target="_blank" rel="noopener noreferrer">Falar com a equipe</a>
         </div>
       </div>
-      <div class="ai-chat-typing" id="ai-chat-typing" role="status" aria-live="polite" hidden>Preparando uma resposta…</div>
+      <div class="ai-chat-typing" id="ai-chat-typing" role="status" aria-live="polite" hidden>Digitando...</div>
       <form class="ai-chat-form" id="ai-chat-form">
         <label class="visually-hidden" for="ai-chat-input">Digite sua pergunta</label>
         <input class="ai-chat-input" id="ai-chat-input" name="message" type="text" maxlength="1000" autocomplete="off" placeholder="Escreva sua pergunta…" required>
         <button class="ai-chat-send" id="ai-chat-send" type="submit" aria-label="Enviar pergunta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-7.2 18-3.6-7.2L3 10.2 21 3Z"/><path d="M10.2 13.8 21 3"/></svg></button>
       </form>
-      <p class="ai-chat-privacy">Não envie dados pessoais ou informações médicas. Em caso de emergência, ligue (21) 3393-0985 ou vá ao hospital.</p>
+      <p class="ai-chat-privacy">O assistente não avalia sintomas. Para falar sobre eles, use os links de WhatsApp ou telefone; a mensagem só será enviada depois que você a revisar no WhatsApp. Em emergência, ligue (21) 3393-0985 ou vá ao hospital.</p>
     </section>
   </section>
   <script>
@@ -339,10 +343,26 @@
         launcher.focus();
       }
 
-      function appendMessage(text, role) {
+      function appendMessage(text, role, actions = []) {
         const message = document.createElement('div');
         message.className = `ai-chat-message ${role}`;
         message.textContent = text;
+        if (role === 'assistant' && Array.isArray(actions)) {
+          const actionList = document.createElement('div');
+          actionList.className = 'ai-chat-actions';
+          actions.forEach((action) => {
+            if (!action || typeof action.label !== 'string' || typeof action.href !== 'string') return;
+            const isWhatsApp = action.href.startsWith('https://wa.me/');
+            const isPhone = /^tel:\+5521\d{8,9}$/.test(action.href);
+            if (!isWhatsApp && !isPhone) return;
+            const link = document.createElement('a');
+            link.href = action.href;
+            link.textContent = action.label;
+            if (isWhatsApp) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
+            actionList.appendChild(link);
+          });
+          if (actionList.childElementCount) message.appendChild(actionList);
+        }
         transcript.appendChild(message);
         transcript.scrollTop = transcript.scrollHeight;
         return message;
@@ -368,7 +388,7 @@
           });
           const data = await response.json().catch(() => ({}));
           if (!response.ok || typeof data.reply !== 'string') throw new Error(data.error || 'Falha no atendimento');
-          appendMessage(data.reply, 'assistant');
+          appendMessage(data.reply, 'assistant', data.actions);
           history.push({ role: 'user', content }, { role: 'assistant', content: data.reply });
           if (history.length > 10) history.splice(0, history.length - 10);
         } catch {
